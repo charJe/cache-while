@@ -17,7 +17,8 @@ Invalidate cache every 5 minutes or if ~value~ changes. ~ht~ is some hash-table.
 #+BEGIN_SRC lisp
   (cache-while ht
       ((eq value)
-       (eq (= 0 (mod 5 (nth-value 1 (get-decoded-time))))))
+       (= (floor (/ (nth-value 1 (get-decoded-time))
+                    5))))
     ;; some expensive calculation
     )
 #+END_SRC
