@@ -1,0 +1,23 @@
+#+title: Cache-While
+
+Cache any part of your program based on the values of expressions.
+
+Macro: ~(cache-while place eqs-values &body body)~
+
+~eqs-values~ is a list of pairs where the first element is an equivalence function (not evaluated) and the second element is an expression (evaluated).
+
+For each place use in a particular call to ~cache-while~, only the most recent result is cache. The cached result is the evaluation of ~body~.
+
+~body~ is re-evaluated if any of the evaluated values in ~eqs-values~ is different than the most recent.
+
+* Caching based on time
+~cache-while~ invalidates the cache when any of the values change. If one of those values is based on time, then you have a timed invalidation.
+
+Invalidate cache every 5 minutes or if ~value~ changes. ~ht~ is some hash-table.
+#+BEGIN_SRC lisp
+  (cache-while ht
+      ((eq value)
+       (eq (= 0 (mod 5 (nth-value 1 (get-decoded-time))))))
+    ;; some expensive calculation
+    )
+#+END_SRC
