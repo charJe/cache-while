@@ -12,7 +12,7 @@ For each place use in a particular call to ~cache-while~, only the most recent r
 
 ~body~ is re-evaluated if any of the evaluated values in ~eqs-values~ is different than the most recent.
 
-* Caching based on time
+** Caching based on time
 ~cache-while~ invalidates the cache when any of the values change. If one of those values is based on time, then you have a timed invalidation.
 
 Invalidate cache every 5 minutes or if ~value~ changes. ~cache~ is where the cache is to be stored
@@ -25,7 +25,7 @@ Invalidate cache every 5 minutes or if ~value~ changes. ~cache~ is where the cac
     )
 #+END_SRC
 
-* Storing cache in session
+** Storing cache in session
 For web programming you might want each user to have a unique cache.
 
 #+BEGIN_SRC lisp
