@@ -24,3 +24,14 @@ Invalidate cache every 5 minutes or if ~value~ changes. ~cache~ is where the cac
     ;; some expensive calculation
     )
 #+END_SRC
+
+* Storing cache in session
+For web programming you might want each user to have a unique cache.
+
+#+BEGIN_SRC lisp
+  (cache-while (session-value :cache)
+      ((string= (get-parameter "search")))
+    ;; something you want to do only when the search GET argument changes
+    ;; probably query the database or something
+    )
+#+END_SRC
