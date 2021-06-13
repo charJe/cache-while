@@ -4,6 +4,8 @@ Cache any part of your program based on the values of expressions.
 
 Macro: ~(cache-while place eqs-values &body body)~
 
+~place~ is any setf-able place. That is where the cache will live.
+
 ~eqs-values~ is a list of pairs where the first element is an equivalence function (not evaluated) and the second element is an expression (evaluated).
 
 For each place use in a particular call to ~cache-while~, only the most recent result is cache. The cached result is the evaluation of ~body~.
@@ -13,9 +15,9 @@ For each place use in a particular call to ~cache-while~, only the most recent r
 * Caching based on time
 ~cache-while~ invalidates the cache when any of the values change. If one of those values is based on time, then you have a timed invalidation.
 
-Invalidate cache every 5 minutes or if ~value~ changes. ~ht~ is some hash-table.
+Invalidate cache every 5 minutes or if ~value~ changes. ~cache~ is where the cache is to be stored
 #+BEGIN_SRC lisp
-  (cache-while ht
+  (cache-while cache
       ((eq value)
        (= (floor (/ (nth-value 1 (get-decoded-time))
                     5))))
