@@ -4,37 +4,44 @@
   (let ((values (gensym))
         (eqs (gensym))
         (spots (loop for i from 1 to (length eqs-values)
-                         collect i))
+                     collect i))
         (result 0)
         (mvalues (map 'list 'second eqs-values))
         (meqs (map 'list 'first eqs-values))
-        (cache (gensym)))
-    `(let ((,values (list ,@mvalues))
-           (,eqs (quote ,meqs))
-           (,cache ,(if (symbolp place)
-                        `(when (boundp ',place)
-                           ,place)
-                        place)))
-       (if (or (null ,cache)
-                (notevery (lambda (val1 test val2)
-                            (funcall test val1 val2))
-                          (map 'list (lambda (spot)
-                                       (elt ,cache spot))
-                               ',spots)
-                          ,eqs
-                          ,values))
+        (cache (gensym "CACHE"))
+        (calculated-place (gensym)))
+    `(progn
+       (unless ,(if (symbolp place)
+                    `(and (boundp ',place)
+                          ,place)
+                    place)
+         ;; PLACE is table of arrays
+         (setf ,place (make-hash-table)))
+       (let* ((,values (list ,@mvalues))
+              (,eqs ',meqs)
+              (,calculated-place ,place)
+              ;; CACHE is array
+              (,cache
+                (or (gethash ',cache ,calculated-place)
+                    (setf (gethash ',cache ,calculated-place)
+                          (make-array ,(+ 1 (length spots))
+                                    :initial-element nil)))))
+         (if (notevery
+              (lambda (val1 test val2)
+                (funcall test val1 val2))
+              (map 'list (lambda (spot)
+                           (elt ,cache spot))
+                   ',spots)
+              ,eqs
+              ,values)
            (progn
-             (unless ,cache
-               (setf ,place
-                     (make-array ,(+ 1 (length spots))
-                                 :initial-element nil)))
              (mapc
               (lambda (spot value)
-                (setf (elt ,place spot)
+                (setf (elt ,cache spot)
                       value))
               ',spots
               ,values)
-             (setf (elt ,place ,result)
+             (setf (elt ,cache ,result)
                    (progn
                      ,@body)))
-           (elt ,cache ,result)))))
+           (elt ,cache ,result))))))
