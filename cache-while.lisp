@@ -3,15 +3,17 @@
 (defmacro cache-while (place eqs-values &body body)
   (let ((values (gensym))
         (eqs (gensym))
-        (spots (loop for i from 1 to (length eqs-values)
+        (mspots (loop for i from 1 to (length eqs-values)
                      collect i))
         (result 0)
         (mvalues (map 'list 'second eqs-values))
         (meqs (map 'list 'first eqs-values))
+        (spots (gensym))
         (cache (gensym "CACHE"))
         (calculated-place (gensym)))
     `(let* ((,values (list ,@mvalues))
             (,eqs ',meqs)
+            (,spots ',mspots)
             (,calculated-place
               (or ,(if (symbolp place)
                        `(and (boundp ',place)
@@ -23,14 +25,14 @@
             (,cache
               (or (gethash ',cache ,calculated-place)
                   (setf (gethash ',cache ,calculated-place)
-                        (make-array ,(+ 1 (length spots))
+                        (make-array ,(+ 1 (length mspots))
                                     :initial-element nil)))))
             (if (notevery
                  (lambda (val1 test val2)
                    (funcall test val1 val2))
                  (map 'list (lambda (spot)
                               (elt ,cache spot))
-                      ',spots)
+                      ,spots)
                  ,eqs
                  ,values)
                 (progn
@@ -38,7 +40,7 @@
                    (lambda (spot value)
                      (setf (elt ,cache spot)
                            value))
-                   ',spots
+                   ,spots
                    ,values)
                   (setf (elt ,cache ,result)
                         (progn
