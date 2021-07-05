@@ -5,7 +5,7 @@
 invalidate based on expressions evaluating to different values."
   :version "0.0.0"
   :author "Charles Jackson <charles.b.jackson@protonmail.com>"
-  :licence "GPL3"
+  :licence "LLGPL"
   :serial t
   :components
   ((:file "package")
